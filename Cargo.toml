@@ -1,5 +1,5 @@
 [package]
-name = "project-template"
+name = "replacer"
 version = "0.1.0"
 authors = ["Thomas Versteeg <thomas.versteeg@nepgroup.com>"]
 edition = "2018"

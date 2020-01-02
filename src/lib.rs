@@ -14,7 +14,7 @@
 //! # Example
 //!
 //! ```rust
-//! use project_template::{Rule, StringRule, TemplateBuilder};
+//! use replacer::{Rule, StringRule, TemplateBuilder};
 //!
 //! fn main() -> anyhow::Result<()> {
 //!     let template = TemplateBuilder::new()
@@ -39,9 +39,9 @@
 //!
 //! ```rust
 //! // Unfortunately the type needs to be wrapped with angle brackets here
-//! let some_type = <project_template::rust_type!(replace_with_type; String)>::new();
+//! let some_type = <replacer::rust_type!(replace_with_type; String)>::new();
 //!
-//! let some_generic_type: Vec<project_template::rust_type!(replace_with_type_in_vec; i32)> = vec![];
+//! let some_generic_type: Vec<replacer::rust_type!(replace_with_type_in_vec; i32)> = vec![];
 //! ```
 
 use anyhow::Result;
@@ -67,7 +67,7 @@ pub trait Rule {
 /// This will look for any code containing the `${..}` sequence where `..` is
 /// filled with the matches.
 /// ```rust
-/// # use project_template::{Rule, StringRule};
+/// # use replacer::{Rule, StringRule};
 /// # fn main() -> anyhow::Result<()> {
 /// let rule = StringRule::new("replace", "world")?;
 /// assert_eq!(rule.convert("Hello $$replace$$!")?, "Hello world!");
@@ -114,7 +114,7 @@ impl TemplateBuilder {
     /// A rule is defined by anything that implements the [`Rule`] trait.
     ///
     /// ```rust
-    /// # use project_template::{Rule, StringRule, TemplateBuilder};
+    /// # use replacer::{Rule, StringRule, TemplateBuilder};
     /// # fn main() -> anyhow::Result<()> {
     /// let template = TemplateBuilder::new()
     ///     .rule(StringRule::new("replace", "world")?)
@@ -142,7 +142,7 @@ impl TemplateBuilder {
 /// Use [`TemplateBuilder`] to instaniate a new Template.
 ///
 /// ```rust
-/// # use project_template::{Rule, StringRule, TemplateBuilder};
+/// # use replacer::{Rule, StringRule, TemplateBuilder};
 /// # fn main() -> anyhow::Result<()> {
 /// let template = TemplateBuilder::new()
 ///     .rule(StringRule::new("replace", "world")?)
