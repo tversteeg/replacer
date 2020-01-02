@@ -33,6 +33,7 @@
 //!
 //! ```rust
 //! let some_str = "Hello $$replace_with_world$$!";
+//! # assert_eq!(some_str, "Hello $$replace_with_world$$!");
 //! ```
 //!
 //! ### [`TypeRule`]
@@ -40,17 +41,19 @@
 //! ```rust
 //! // Unfortunately the type needs to be wrapped with angle brackets here
 //! let some_type = <replacer::rust_type!(replace_with_type; String)>::new();
+//! # assert_eq!(some_type, "");
 //!
 //! let some_generic_type: Vec<replacer::rust_type!(replace_with_type_in_vec; i32)> = vec![];
+//! # assert_eq!(some_generic_type, vec![]);
 //! ```
 
 use anyhow::Result;
 
-/// Template macro for replacing a Rust type with a default type that can be compiled.
+/// Template macro for replacing a Rust type with a placeholder type that can be compiled.
 #[macro_export]
 macro_rules! rust_type {
-    ($_name:ident; $replacement_type:ty) => {
-        $replacement_type
+    ($_name:ident; $placeholder:ty) => {
+        $placeholder
     };
 }
 
@@ -84,7 +87,7 @@ pub struct StringRule {
 
 impl Rule for StringRule {
     fn convert(&self, template: &str) -> Result<String> {
-        todo!();
+        Ok(template.replace(&self.matches, &self.replace_with))
     }
 }
 
@@ -92,7 +95,7 @@ impl StringRule {
     /// Setup a new rule.
     pub fn new(matches: &str, replace_with: &str) -> Result<Self> {
         Ok(Self {
-            matches: matches.to_string(),
+            matches: format!("$${}$$", matches),
             replace_with: replace_with.to_string(),
         })
     }
