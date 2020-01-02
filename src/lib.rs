@@ -2,12 +2,6 @@
 //!
 //! # Features
 //!
-//! ### Rule-based
-//!
-//! - Different rule types
-//!     - Macro: `!template(..)`
-//!     - String: `"Hello ${replace_with_world}!"`
-//!
 //! ### Valid Rust
 //!
 //! - All templates can be compilable Rust source files
@@ -15,30 +9,55 @@
 //!
 //! ### Extensible
 //!
-//! - Implement [`FileRule`] to add new rules
+//! - Implement [`Rule`] to add new rules
 //!
 //! # Example
 //!
 //! ```rust
-//! use project_template::{FileRule, StringRule, TemplateBuilder};
+//! use project_template::{Rule, StringRule, TemplateBuilder};
 //!
 //! fn main() -> anyhow::Result<()> {
 //!     let template = TemplateBuilder::new()
 //!         .rule(StringRule::new("replace", "world")?)
 //!         .build();
 //!
-//!     assert_eq!(template.apply("Hello ${replace}!")?, "Hello world!");
+//!     assert_eq!(template.apply("Hello $$replace$$!")?, "Hello world!");
 //!
 //!     Ok(())
 //! }
 //! ```
+//!
+//! # Rules
+//!
+//! ### [`StringRule`]
+//!
+//! ```rust
+//! let some_str = "Hello $$replace_with_world$$!";
+//! ```
+//!
+//! ### [`TypeRule`]
+//!
+//! ```rust
+//! // Unfortunately the type needs to be wrapped with angle brackets here
+//! let some_type = <project_template::rust_type!(replace_with_type; String)>::new();
+//!
+//! let some_generic_type: Vec<project_template::rust_type!(replace_with_type_in_vec; i32)> = vec![];
+//! ```
 
 use anyhow::Result;
+
+/// Template macro for replacing a Rust type with a default type that can be compiled.
+#[macro_export]
+macro_rules! rust_type {
+    ($_name:ident; $replacement_type:ty) => {
+        $replacement_type
+    };
+}
 
 /// Generic way to add rules for a single file.
 ///
 /// This trait can be implemented on a struct or enum for custom template handling.
-pub trait FileRule {
+pub trait Rule {
     /// Convert the matched values to a string.
     fn convert(&self, template: &str) -> Result<String>;
 }
@@ -48,10 +67,10 @@ pub trait FileRule {
 /// This will look for any code containing the `${..}` sequence where `..` is
 /// filled with the matches.
 /// ```rust
-/// # use project_template::{FileRule, StringRule};
+/// # use project_template::{Rule, StringRule};
 /// # fn main() -> anyhow::Result<()> {
 /// let rule = StringRule::new("replace", "world")?;
-/// assert_eq!(rule.convert("Hello ${replace}!")?, "Hello world!");
+/// assert_eq!(rule.convert("Hello $$replace$$!")?, "Hello world!");
 /// # Ok(())
 /// # }
 /// ```
@@ -63,21 +82,9 @@ pub struct StringRule {
     replace_with: String,
 }
 
-impl FileRule for StringRule {
+impl Rule for StringRule {
     fn convert(&self, template: &str) -> Result<String> {
-        let opts = markings::Opts::default()
-            .optional_keys()
-            .duplicate_keys()
-            .empty_template()
-            .build();
-
-        let markings_template = markings::Template::parse(&template, opts).unwrap();
-
-        let args = markings::Args::new()
-            .with(&self.matches, &self.replace_with)
-            .build();
-
-        Ok(markings_template.apply(&args).unwrap())
+        todo!();
     }
 }
 
@@ -93,7 +100,7 @@ impl StringRule {
 
 /// Builder for the [`Template`] struct.
 pub struct TemplateBuilder {
-    rules: Vec<Box<dyn FileRule>>,
+    rules: Vec<Box<dyn Rule>>,
 }
 
 impl TemplateBuilder {
@@ -104,10 +111,10 @@ impl TemplateBuilder {
 
     /// Add a new rule that can be applied in batch.
     ///
-    /// A rule is defined by anything that implements the [`FileRule`] trait.
+    /// A rule is defined by anything that implements the [`Rule`] trait.
     ///
     /// ```rust
-    /// # use project_template::{FileRule, StringRule, TemplateBuilder};
+    /// # use project_template::{Rule, StringRule, TemplateBuilder};
     /// # fn main() -> anyhow::Result<()> {
     /// let template = TemplateBuilder::new()
     ///     .rule(StringRule::new("replace", "world")?)
@@ -117,7 +124,7 @@ impl TemplateBuilder {
     /// ```
     pub fn rule<R>(mut self, rule: R) -> Self
     where
-        R: FileRule + 'static,
+        R: Rule + 'static,
     {
         self.rules.push(Box::new(rule));
 
@@ -135,18 +142,18 @@ impl TemplateBuilder {
 /// Use [`TemplateBuilder`] to instaniate a new Template.
 ///
 /// ```rust
-/// # use project_template::{FileRule, StringRule, TemplateBuilder};
+/// # use project_template::{Rule, StringRule, TemplateBuilder};
 /// # fn main() -> anyhow::Result<()> {
 /// let template = TemplateBuilder::new()
 ///     .rule(StringRule::new("replace", "world")?)
 ///     .build();
 ///
-/// assert_eq!(template.apply("Hello ${replace}")?, "Hello world");
+/// assert_eq!(template.apply("Hello $$replace$$")?, "Hello world");
 /// # Ok(())
 /// # }
 /// ```
 pub struct Template {
-    rules: Vec<Box<dyn FileRule>>,
+    rules: Vec<Box<dyn Rule>>,
 }
 
 impl Template {
@@ -155,7 +162,9 @@ impl Template {
         self.rules
             .iter()
             .fold(Ok(code.to_string()), |code, rule| match code {
+                // Apply the rule and return the string if there are no errors
                 Ok(code) => rule.convert(&code),
+                // Propagate errors further
                 Err(err) => Err(err),
             })
     }
@@ -170,7 +179,7 @@ mod tests {
         assert_eq!(
             StringRule::new("replace", "world")
                 .unwrap()
-                .convert("Hello ${replace}!")
+                .convert("Hello $$replace$$!")
                 .unwrap(),
             "Hello world!"
         );
@@ -184,7 +193,7 @@ mod tests {
         assert_eq!(
             StringRule::new("replace", "world")
                 .unwrap()
-                .convert("Hello ${replace}, bye ${replace}!")
+                .convert("Hello $$replace$$, bye $$replace$$!")
                 .unwrap(),
             "Hello world, bye world!"
         );
