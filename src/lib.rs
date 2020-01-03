@@ -54,6 +54,12 @@
 //! ```rust
 //! replacer::rust_struct!(replace_with_struct; Point; x: i32, y: i32;);
 //! ```
+//!
+//! ### [`ExprRule`]
+//!
+//! ```rust
+//! println!("1 + 1 = {}", replacer::rust_expr!(replace_with_expression; 1 + 2;));
+//! ```
 
 use anyhow::Result;
 use regex::{Captures, Regex};
@@ -80,6 +86,18 @@ macro_rules! rust_type {
 macro_rules! rust_struct {
     ($_name:ident; $placeholder:ident; $($element: ident: $ty: ty),*;) => {
         struct $placeholder { $($element: $ty),* }
+    };
+}
+
+/// Template macro for replacing a Rust expression with a placeholder expression that can be compiled.
+///
+/// ```rust
+/// let two = replacer::rust_expr!(replace_with_expression; 1 + 1;);
+/// ```
+#[macro_export]
+macro_rules! rust_expr {
+    ($_name:ident; $placeholder:expr;) => {
+        $placeholder
     };
 }
 
@@ -199,6 +217,44 @@ impl StructRule {
             r"replacer::rust_struct!\s*[\({{]{};[^;]+;([^;]+);[\)}}]",
             matches
         ))?;
+
+        Ok(Self {
+            replace_with: replace_with.to_string(),
+            regex,
+        })
+    }
+}
+
+/// Replace a Rust expression.
+/// ```rust
+/// # use replacer::{Rule, ExprRule};
+/// # fn main() -> anyhow::Result<()> {
+/// let rule = ExprRule::new("replace_with_expression", "1 + 1")?;
+/// assert_eq!(rule.convert("let two = replacer::rust_expr!(replace_with_expression; 2 + 2;);")?,
+///     "let two = 1 + 1;");
+/// # Ok(())
+/// # }
+/// ```
+pub struct ExprRule {
+    /// What the keyword will be replaced with.
+    replace_with: String,
+    /// Regex used to find the macro.
+    regex: Regex,
+}
+
+impl Rule for ExprRule {
+    fn convert(&self, template: &str) -> Result<String> {
+        let replace_with: &str = &self.replace_with;
+        let replace = self.regex.replace_all(template, replace_with);
+
+        Ok(replace.into_owned())
+    }
+}
+
+impl ExprRule {
+    /// Setup a new rule.
+    pub fn new(matches: &str, replace_with: &str) -> Result<Self> {
+        let regex = Regex::new(&format!(r"replacer::rust_expr!\({};[^;]+;\)", matches))?;
 
         Ok(Self {
             replace_with: replace_with.to_string(),
