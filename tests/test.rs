@@ -1,10 +1,10 @@
 use replacer::{StringRule, TemplateBuilder, TypeRule};
 
-const STRING_TEMPLATE: &'static str = include_str!("templates/string.rs");
-const STRING_RESULT: &'static str = include_str!("results/string.rs");
+const STRING_TEMPLATE: &str = include_str!("templates/string.rs");
+const STRING_RESULT: &str = include_str!("results/string.rs");
 
-const TYPE_TEMPLATE: &'static str = include_str!("templates/type.rs");
-const TYPE_RESULT: &'static str = include_str!("results/type.rs");
+const TYPE_TEMPLATE: &str = include_str!("templates/type.rs");
+const TYPE_RESULT: &str = include_str!("results/type.rs");
 
 #[test]
 fn test_string() {
