@@ -1,4 +1,4 @@
-//! A crate for creating Rust templates.
+//! A crate for creating templates from Rust source files.
 //!
 //! # Features
 //!
