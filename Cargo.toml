@@ -1,8 +1,19 @@
 [package]
 name = "replacer"
 version = "0.1.0"
-authors = ["Thomas Versteeg <thomas.versteeg@nepgroup.com>"]
+authors = ["Thomas Versteeg <thomasversteeg@gmx.com>"]
 edition = "2018"
+license = "GPL-3.0"
+description = "Creating compilable Rust source code templates."
+repository = "https://github.com/tversteeg/replacer"
+documentation = "https://docs.rs/replacer"
+keywords = ["template", "rust", "source"]
+categories = ["template-engine", "rust-patterns", "development-tools"]
+readme = "README.md"
+
+[badges]
+is-it-maintained-issue-resolution = { repository = "tversteeg/replacer" }
+is-it-maintained-open-issues = { repository = "tversteeg/replacer" }
 
 [dependencies]
 anyhow = "1.0.26"
