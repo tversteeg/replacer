@@ -34,6 +34,8 @@
 //! ```rust
 //! let some_str = "Hello $$replace_with_world$$!";
 //! # assert_eq!(some_str, "Hello $$replace_with_world$$!");
+//!
+//! // Also works in comments, hello $$replace_with_world$$
 //! ```
 //!
 //! ### [`TypeRule`]
@@ -51,6 +53,11 @@ use anyhow::Result;
 use regex::Regex;
 
 /// Template macro for replacing a Rust type with a placeholder type that can be compiled.
+///
+/// ```rust
+/// let some_type = <replacer::rust_type!(replace_with_type; String;)>::new();
+/// # assert_eq!(some_type, "");
+/// ```
 #[macro_export]
 macro_rules! rust_type {
     ($_name:ident; $placeholder:ty;) => {
@@ -102,7 +109,7 @@ impl StringRule {
     }
 }
 
-/// Replace a type inside another type.
+/// Replace a Rust type.
 ///
 /// This will look for any code containing the `${..}` sequence where `..` is
 /// filled with the matches.
@@ -217,55 +224,45 @@ impl Template {
 
 #[cfg(test)]
 mod tests {
+    use anyhow::Result;
+
     use super::*;
 
     #[test]
-    fn string_rule() {
+    fn string_rule() -> Result<()> {
         assert_eq!(
-            StringRule::new("replace", "world")
-                .unwrap()
-                .convert("Hello $$replace$$!")
-                .unwrap(),
+            StringRule::new("replace", "world")?.convert("Hello $$replace$$!")?,
             "Hello world!"
         );
         assert_eq!(
-            StringRule::new("replace", "world")
-                .unwrap()
-                .convert("Hello world!")
-                .unwrap(),
+            StringRule::new("replace", "world")?.convert("Hello world!")?,
             "Hello world!"
         );
         assert_eq!(
-            StringRule::new("replace", "world")
-                .unwrap()
-                .convert("Hello $$replace$$, bye $$replace$$!")
-                .unwrap(),
+            StringRule::new("replace", "world")?.convert("Hello $$replace$$, bye $$replace$$!")?,
             "Hello world, bye world!"
         );
+
+        Ok(())
     }
 
     #[test]
-    fn type_rule() {
+    fn type_rule() -> Result<()> {
         assert_eq!(
-            TypeRule::new("replace", "i32")
-                .unwrap()
-                .convert("let some_type = <replacer::rust_type!(replace; String;)>::new();")
-                .unwrap(),
+            TypeRule::new("replace", "i32")?
+                .convert("let some_type = <replacer::rust_type!(replace; String;)>::new();")?,
             "let some_type = <i32>::new();"
         );
         assert_eq!(
-            TypeRule::new("replace", "i32")
-                .unwrap()
-                .convert("Hello world!")
-                .unwrap(),
+            TypeRule::new("replace", "i32")?.convert("Hello world!")?,
             "Hello world!"
         );
         assert_eq!(
-            TypeRule::new("replace", "i32")
-                .unwrap()
-                .convert("let some_type = Map<replacer::rust_type!(replace; String;), replacer::rust_type!(replace; String;)>::new();")
-                .unwrap(),
+            TypeRule::new("replace", "i32")?
+                .convert("let some_type = Map<replacer::rust_type!(replace; String;), replacer::rust_type!(replace; String;)>::new();")?,
             "let some_type = Map<i32, i32>::new();"
         );
+
+        Ok(())
     }
 }
