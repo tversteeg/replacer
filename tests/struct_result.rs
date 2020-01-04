@@ -7,6 +7,9 @@ impl Point2D {
     }
 }
 
+#[rustfmt::skip]
+pub struct Rectangle { x: i32, y: i32, width: i32, height: i32 }
+
 fn main() {
     let p = <Point2D>::new();
     println!("({}, {})", p.x, p.y);
