@@ -1,3 +1,5 @@
+use pretty_assertions::assert_eq;
+
 use replacer::{rule::ExprRule, TemplateBuilder};
 
 const EXPR_TEMPLATE: &str = include_str!("expr_template.rs");

@@ -1,3 +1,5 @@
+use pretty_assertions::assert_eq;
+
 use replacer::{rule::StringRule, TemplateBuilder};
 
 const STRING_TEMPLATE: &str = include_str!("string_template.rs");

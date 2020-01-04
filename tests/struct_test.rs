@@ -1,3 +1,5 @@
+use pretty_assertions::assert_eq;
+
 use replacer::{
     rule::{StructRule, TypeRule},
     TemplateBuilder,
