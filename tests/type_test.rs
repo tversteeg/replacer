@@ -1,4 +1,4 @@
-use replacer::{TemplateBuilder, TypeRule};
+use replacer::{rule::TypeRule, TemplateBuilder};
 
 const TYPE_TEMPLATE: &str = include_str!("type_template.rs");
 const TYPE_RESULT: &str = include_str!("type_result.rs");

@@ -22,7 +22,7 @@ fn main() {
 Rust script to parse the template:
 
 ```rust
-use replacer::{Rule, StringRule, TemplateBuilder};
+use replacer::{rule::{StringRule, TypeRule}, TemplateBuilder};
 
 fn main() {
     let template = TemplateBuilder::new()
@@ -38,7 +38,7 @@ Rust template that will be printed:
 
 ```rust
 fn main() {
-	prinln!("Hello world!");
+	println!("Hello world!");
 
 	let some_type = <Vec>::new();
 }

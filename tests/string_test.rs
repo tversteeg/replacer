@@ -1,4 +1,4 @@
-use replacer::{StringRule, TemplateBuilder};
+use replacer::{rule::StringRule, TemplateBuilder};
 
 const STRING_TEMPLATE: &str = include_str!("string_template.rs");
 const STRING_RESULT: &str = include_str!("string_result.rs");

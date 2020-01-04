@@ -1,4 +1,4 @@
-use replacer::{ExprRule, TemplateBuilder};
+use replacer::{rule::ExprRule, TemplateBuilder};
 
 const EXPR_TEMPLATE: &str = include_str!("expr_template.rs");
 const EXPR_RESULT: &str = include_str!("expr_result.rs");

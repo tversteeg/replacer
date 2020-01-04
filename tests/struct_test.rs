@@ -1,4 +1,7 @@
-use replacer::{StructRule, TemplateBuilder, TypeRule};
+use replacer::{
+    rule::{StructRule, TypeRule},
+    TemplateBuilder,
+};
 
 const STRUCT_TEMPLATE: &str = include_str!("struct_template.rs");
 const STRUCT_RESULT: &str = include_str!("struct_result.rs");
