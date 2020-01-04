@@ -7,16 +7,16 @@ use crate::Rule;
 ///
 /// ```rust
 /// // Private
-/// replacer::rust_struct!(replace_with_struct; Point2D; x: i32, y: i32;);
+/// replacer::rust_struct!(replace_with_struct; Point2D { x: i32, y: i32 };);
 /// // Public
-/// replacer::rust_struct!(pub replace_with_other_struct; Point3D; x: i32, y: i32, z: i32;);
+/// replacer::rust_struct!(pub replace_with_other_struct; Point3D { x: i32, y: i32, z: i32 };);
 /// ```
 #[macro_export]
 macro_rules! rust_struct {
-    ($_name:ident; $placeholder:ident; $($element: ident: $ty: ty),*;) => {
+    ($_name:ident; $placeholder:ident {$($element: ident: $ty: ty),*};) => {
         struct $placeholder { $($element: $ty),* }
     };
-    (pub $_name:ident; $placeholder:ident; $($element: ident: $ty: ty),*;) => {
+    (pub $_name:ident; $placeholder:ident {$($element: ident: $ty: ty),*};) => {
         pub struct $placeholder { $($element: $ty),* }
     };
 }
@@ -25,8 +25,8 @@ macro_rules! rust_struct {
 /// ```rust
 /// # use replacer::rule::{Rule, StructRule};
 /// # fn main() -> anyhow::Result<()> {
-/// let rule = StructRule::new("replace_with_struct", "Point2D")?;
-/// assert_eq!(rule.convert("replacer::rust_struct!(replace_with_struct; Point; x: i32, y: i32;}")?,
+/// let rule = StructRule::new("point", "Point2D")?;
+/// assert_eq!(rule.convert("replacer::rust_struct!(point; Point{ x: i32, y: i32};}")?,
 ///     "struct Point2D { x: i32, y: i32 }");
 /// # Ok(())
 /// # }
@@ -58,8 +58,9 @@ impl StructRule {
     /// Setup a new rule.
     pub fn new(matches: &str, replace_with: &str) -> Result<Self> {
         let regex = Regex::new(&format!(
-            r"replacer::rust_struct!\s*[\({{](?P<pub>pub )?{};[^;]+;(?P<type>[^;]+);[\)}}]",
-            matches
+            r"{}[\({{]{}[\)}}]",
+            r"replacer::rust_struct!\s*",
+            format!(r"(?P<pub>pub )?{};[^{{]+\{{(?P<type>[^;]+)}};", matches)
         ))?;
 
         Ok(Self {
@@ -79,12 +80,12 @@ mod tests {
     fn struct_rule() -> Result<()> {
         assert_eq!(
             StructRule::new("replace", "Point2D")?
-                .convert("replacer::rust_struct! {replace; Point; x: i32, y: i32;}")?,
+                .convert("replacer::rust_struct! {replace; Point { x: i32, y: i32};}")?,
             "struct Point2D { x: i32, y: i32 }"
         );
         assert_eq!(
             StructRule::new("replace", "Point2D")?
-                .convert("replacer::rust_struct! {pub replace; Point; x: i32, y: i32;}")?,
+                .convert("replacer::rust_struct! {pub replace; Point{ x: i32, y: i32};}")?,
             "pub struct Point2D { x: i32, y: i32 }"
         );
         assert_eq!(

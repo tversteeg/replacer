@@ -52,7 +52,7 @@
 //! ### [`rule::StructRule`]
 //!
 //! ```rust
-//! replacer::rust_struct!(replace_with_struct; Point; x: i32, y: i32;);
+//! replacer::rust_struct!(replace_with_struct; Point{ x: i32, y: i32 };);
 //! ```
 //!
 //! ### [`rule::ExprRule`]
