@@ -7,6 +7,12 @@ impl Point2D {
     }
 }
 
+impl Default for Point2D {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[rustfmt::skip]
 pub struct Rectangle { pos: Point2D, size: Point2D }
 
@@ -16,6 +22,12 @@ impl Rectangle {
             pos: <Point2D>::new(),
             size: <Point2D>::new(),
         }
+    }
+}
+
+impl Default for Rectangle {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

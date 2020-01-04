@@ -7,6 +7,12 @@ impl replacer::rust_type!(point; Point;) {
     }
 }
 
+impl Default for replacer::rust_type!(point; Point;) {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[rustfmt::skip]
 replacer::rust_struct!{pub rectangle; Square{ pos: replacer::rust_type!(point; Point;), size: replacer::rust_type!(point; Point;)};}
 
@@ -16,6 +22,12 @@ impl replacer::rust_type!(rectangle; Square;) {
             pos: <replacer::rust_type!(point; Point;)>::new(),
             size: <replacer::rust_type!(point; Point;)>::new(),
         }
+    }
+}
+
+impl Default for replacer::rust_type!(rectangle; Square;) {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
