@@ -13,8 +13,9 @@ fn test_struct() {
     let template = TemplateBuilder::new()
         .rule(StructRule::new("point", "Point2D").unwrap())
         .rule(TypeRule::new("point", "Point2D").unwrap())
-        .rule(StructRule::new("rectangle", "Rectangle").unwrap())
+        .rule(StructRule::new("rectangle", "Rectangle<'a>").unwrap())
         .rule(TypeRule::new("rectangle", "Rectangle").unwrap())
+        .rule(TypeRule::new("rectangle_lifetime", "Rectangle<'a>").unwrap())
         .build();
 
     assert_eq!(template.apply(STRUCT_TEMPLATE).unwrap(), STRUCT_RESULT);

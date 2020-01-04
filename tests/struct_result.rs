@@ -1,5 +1,5 @@
 #[rustfmt::skip]
-struct Point2D { x: i32, y: i32 }
+pub struct Point2D { x: i32, y: i32 }
 
 impl Point2D {
     pub fn new() -> Self {
@@ -14,25 +14,20 @@ impl Default for Point2D {
 }
 
 #[rustfmt::skip]
-pub struct Rectangle { pos: Point2D, size: Point2D }
+struct Rectangle<'a> { pos: &'a Point2D, size: Point2D }
 
-impl Rectangle {
-    pub fn new() -> Self {
+impl<'a> Rectangle<'a> {
+    pub fn new(pos: &'a Point2D) -> Self {
         Self {
-            pos: <Point2D>::new(),
+            pos,
             size: <Point2D>::new(),
         }
     }
 }
 
-impl Default for Rectangle {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 fn main() {
-    let shape = <Rectangle>::new();
+    let pos = <Point2D>::new();
+    let shape = <Rectangle>::new(&pos);
     println!(
         "({}, {}, {}, {})",
         shape.pos.x, shape.pos.y, shape.size.x, shape.size.y

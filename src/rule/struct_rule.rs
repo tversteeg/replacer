@@ -10,14 +10,26 @@ use crate::Rule;
 /// replacer::rust_struct!(replace_with_struct; Point2D { x: i32, y: i32 };);
 /// // Public
 /// replacer::rust_struct!(pub replace_with_other_struct; Point3D { x: i32, y: i32, z: i32 };);
+/// // With a lifetime
+/// replacer::rust_struct!(replace_with_struct; Point4D<'a> { x: i32, y: &'a i32, z: i32, w: i32 };);
 /// ```
 #[macro_export]
 macro_rules! rust_struct {
+    // No lifetime, private
     ($_name:ident; $placeholder:ident {$($element: ident: $ty: ty),*};) => {
         struct $placeholder { $($element: $ty),* }
     };
+    // No lifetime, public
     (pub $_name:ident; $placeholder:ident {$($element: ident: $ty: ty),*};) => {
         pub struct $placeholder { $($element: $ty),* }
+    };
+    // Lifetime, private
+    ($_name:ident; $placeholder:ident<$lifetime:lifetime>{$($element: ident: $ty: ty),*};) => {
+        struct $placeholder<$lifetime> { $($element: $ty),* }
+    };
+    // Lifetime, public
+    (pub $_name:ident; $placeholder:ident<$lifetime:lifetime>{$($element: ident: $ty: ty),*};) => {
+        pub struct $placeholder<$lifetime> { $($element: $ty),* }
     };
 }
 
