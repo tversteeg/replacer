@@ -37,9 +37,9 @@ macro_rules! rust_struct {
 /// ```rust
 /// # use replacer::rule::{Rule, StructRule};
 /// # fn main() -> anyhow::Result<()> {
-/// let rule = StructRule::new("point", "Point2D")?;
-/// assert_eq!(rule.convert("replacer::rust_struct!(point; Point{ x: i32, y: i32};}")?,
-///     "struct Point2D { x: i32, y: i32 }");
+/// let rule = StructRule::new("point", "Point3D { x: i32, y: i32, z: i32 }")?;
+/// assert_eq!(rule.convert("replacer::rust_struct!(point; Point2D{ x: i32, y: i32};}")?,
+///     "struct Point3D { x: i32, y: i32, z: i32 }");
 /// # Ok(())
 /// # }
 /// ```
@@ -55,10 +55,9 @@ impl Rule for StructRule {
         let replace_with: &str = &self.replace_with;
         let replace = self.regex.replace_all(template, |caps: &Captures| {
             format!(
-                "{}struct {} {{{} }}",
+                "{}struct {}",
                 &caps.name("pub").map_or("", |cap| cap.as_str()),
                 replace_with,
-                &caps.name("type").unwrap().as_str(),
             )
         });
 
@@ -72,7 +71,7 @@ impl StructRule {
         let regex = Regex::new(&format!(
             r"{}[\({{]{}[\)}}]",
             r"replacer::rust_struct!\s*",
-            format!(r"(?P<pub>pub )?{};[^{{]+\{{(?P<type>[^;]+)}};", matches)
+            format!(r"(?P<pub>pub )?{};[^{{]+\{{[^;]+}};", matches)
         ))?;
 
         Ok(Self {
@@ -91,12 +90,12 @@ mod tests {
     #[test]
     fn struct_rule() -> Result<()> {
         assert_eq!(
-            StructRule::new("replace", "Point2D")?
+            StructRule::new("replace", "Point2D { x: i32, y: i32 }")?
                 .convert("replacer::rust_struct! {replace; Point { x: i32, y: i32};}")?,
             "struct Point2D { x: i32, y: i32 }"
         );
         assert_eq!(
-            StructRule::new("replace", "Point2D")?
+            StructRule::new("replace", "Point2D { x: i32, y: i32 }")?
                 .convert("replacer::rust_struct! {pub replace; Point{ x: i32, y: i32};}")?,
             "pub struct Point2D { x: i32, y: i32 }"
         );

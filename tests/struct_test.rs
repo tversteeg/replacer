@@ -11,9 +11,15 @@ const STRUCT_RESULT: &str = include_str!("struct_result.rs");
 #[test]
 fn test_struct() {
     let template = TemplateBuilder::new()
-        .rule(StructRule::new("point", "Point2D").unwrap())
+        .rule(StructRule::new("point", "Point2D { x: i32, y: i32 }").unwrap())
         .rule(TypeRule::new("point", "Point2D").unwrap())
-        .rule(StructRule::new("rectangle", "Rectangle<'a>").unwrap())
+        .rule(
+            StructRule::new(
+                "rectangle",
+                "Rectangle<'a> { pos: &'a Point2D, size: Point2D }",
+            )
+            .unwrap(),
+        )
         .rule(TypeRule::new("rectangle", "Rectangle").unwrap())
         .rule(TypeRule::new("rectangle_lifetime", "Rectangle<'a>").unwrap())
         .build();
