@@ -16,7 +16,7 @@ is-it-maintained-issue-resolution = { repository = "tversteeg/replacer" }
 is-it-maintained-open-issues = { repository = "tversteeg/replacer" }
 
 [dependencies]
-anyhow = "1.0.26"
+anyhow = "1.0.81"
 regex = "1.3.4"
 
 [dev-dependencies]
